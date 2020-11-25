@@ -1,0 +1,5 @@
+rootProject.name = 'ktor-gradle-template'
+
+include('commons')
+include('service')
+

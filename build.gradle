@@ -1,0 +1,146 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+}
+
+group 'eu.miaplatform'
+version '0.0.1'
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url 'https://www.jitpack.io' }
+}
+
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'org.jetbrains.kotlin.jvm'
+
+sourceCompatibility = 1.8
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '6.0'
+
+    compile 'com.google.guava:guava:28.0-jre'
+
+    compile "com.squareup.retrofit2:retrofit:2.8.1"
+    compile 'com.squareup.retrofit2:converter-jackson:2.8.1'
+    compile 'com.squareup.okhttp3:logging-interceptor:4.5.0'
+
+    compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "io.ktor:ktor-server-core:$ktor_version"
+    compile "io.ktor:ktor-client-core-jvm:$ktor_version"
+    compile "io.ktor:ktor-jackson:$ktor_version"
+
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.1"
+
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.10.3'
+    compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.10.3'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    compile "io.ktor:ktor-server-netty:1.3.2"
+    compile 'com.github.papsign:Ktor-OpenAPI-Generator:0.2-beta.10'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.4.2"
+    testCompile "org.junit.jupiter:junit-jupiter-params:5.4.2"
+    testCompile group: 'com.squareup.okhttp', name: 'mockwebserver', version: '2.7.5'
+    testCompile "io.ktor:ktor-server-tests:$ktor_version"
+    testCompile "com.squareup.retrofit2:retrofit-mock:2.2.0"
+    testCompile "org.powermock:powermock-module-junit4:2.0.2"
+    testCompile "org.powermock:powermock-api-mockito2:2.0.2"
+    testCompile 'org.mock-server:mockserver-netty:5.5.4'
+}
+
+def generatedVersionDir = "${buildDir}/generated-version"
+
+sourceSets {
+    main {
+        output.dir(generatedVersionDir, builtBy: 'generateVersionProperties')
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Main-Class': 'eu.miaplatform.service.ServiceApplicationKt'
+        )
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    archiveFileName = 'application.jar'
+}
+
+task generateVersionProperties {
+    doLast {
+        def propsFile = file "$generatedVersionDir/version.properties"
+        propsFile.parentFile.mkdirs()
+        def props = new Properties()
+        print(rootProject.version.toString())
+        props.setProperty("version", rootProject.version.toString())
+        propsFile.withWriter { props.store(it, null) }
+    }
+}
+processResources.dependsOn generateVersionProperties
+build.dependsOn generateVersionProperties
+
+class UpdateVersion extends DefaultTask {
+    private String tag
+
+    @Option(option = "tag", description = "Updates the project version with specified tag (when supplying the tag do not include the initial v).")
+    void setTag(String tag) {
+        this.tag = tag
+    }
+
+    @Input
+    String getTag() {
+        return tag
+    }
+
+    @TaskAction
+    void print() {
+        getLogger().quiet("Updating files to version $tag")
+        String oldTag = project.version
+
+        getLogger().quiet("Updating build.gradle file")
+        String updatedBuildGradle = project.buildFile.getText().replaceFirst("version '$oldTag'", "version '$tag'")
+        project.buildFile.setText(updatedBuildGradle)
+
+        getLogger().quiet("Updating Changelog and Dockerfile")
+        runCommand("./scripts/update-changelog.sh", tag)
+
+        getLogger().quiet("Commit and tag creation on local repository")
+        String tagName = "v${tag}"
+        runCommand("git", "commit", "-a", "-m", tagName)
+        runCommand("git", "tag", tagName)
+    }
+
+    static String runCommand(String... commands) {
+        Process process = new ProcessBuilder(commands).redirectErrorStream(true).start()
+        process.waitFor()
+        String result = ''
+        process.inputStream.eachLine { result += it + '\n' }
+        boolean error = process.exitValue() != 0
+        if (error) {
+            println(result)
+        }
+        return result
+    }
+}
+//to execute the task: ./gradlew version --tag=[version]
+task version(type: UpdateVersion)
