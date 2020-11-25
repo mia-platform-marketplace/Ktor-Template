@@ -112,7 +112,7 @@ For more details about how to use the `apiRouting see https://github.com/papsign
 
 You have to import this file in the [file](https://github.com/mia-platform-marketplace/Ktor-Template/tree/master/src/main/kotlin/eu/miaplatform/service/ServiceApplication.kt) inside the `apiRouting` installation. 
 
-In this file you can see the instantiation of the library that creates the saggwers reachable at the endpoint /documentation.
+In this file you can see the instantiation of the library that creates the saggwers reachable at the endpoint `/documentation`.
 
 After committing these changes to your repository, you can go back to Mia Platform DevOps Console.  
 Go to the **Deploy** area of the DevOps Console and deploy your project in a similar way to what you have done before modifying your git repository.
