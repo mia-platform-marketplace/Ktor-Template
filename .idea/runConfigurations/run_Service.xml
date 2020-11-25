@@ -18,11 +18,6 @@
     <option name="PASS_PARENT_ENVS" value="true" />
     <option name="MAIN_CLASS_NAME" value="eu.miaplatform.service.ServiceApplicationKt" />
     <option name="WORKING_DIRECTORY" value="" />
-    <envs>
-      <env name="LOG_LEVEL" value="info" />
-      <env name="HTTP_LOG_LEVEL" value="none" />
-      <env name="LOG_CONFIG_FILE" value="logback.xml" />
-    </envs>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
