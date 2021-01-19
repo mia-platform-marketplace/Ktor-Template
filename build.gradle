@@ -54,7 +54,7 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile "org.junit.jupiter:junit-jupiter-api:5.4.2"
-    testCompile "org.junit.jupiter:junit-jupiter-params:5.4.2"
+    testCompile "org.junit.jupiter:junit-jupiter-params:5.7.0"
     testCompile group: 'com.squareup.okhttp', name: 'mockwebserver', version: '2.7.5'
     testCompile "io.ktor:ktor-server-tests:$ktor_version"
     testCompile "com.squareup.retrofit2:retrofit-mock:2.2.0"
