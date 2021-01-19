@@ -60,7 +60,7 @@ dependencies {
     testCompile "com.squareup.retrofit2:retrofit-mock:2.2.0"
     testCompile "org.powermock:powermock-module-junit4:2.0.2"
     testCompile "org.powermock:powermock-api-mockito2:2.0.2"
-    testCompile 'org.mock-server:mockserver-netty:5.5.4'
+    testCompile 'org.mock-server:mockserver-netty:5.11.2'
 }
 
 def generatedVersionDir = "${buildDir}/generated-version"
