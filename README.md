@@ -14,10 +14,6 @@ For this walkthrough select the following example: **Ktor Template**.
 Give your microservice the name you prefer, in this walkthrough we'll refer to it with the following name: **my-ktor-service-name**. Then, fill the other required fields and confirm that you want to create a microservice.  
 A more detailed description on how to create a Microservice can be found in [Microservice from template - Get started](https://docs.mia-platform.eu/development_suite/api-console/api-design/custom_microservice_get_started/#2-service-creation) section of Mia-Platform documentation.
 
-## Remove status probes
-
-In order to run this example correctly, it is necessary to remove the default probes of your microservice. To do so, go to the table *Microservice configuration* of the newly created microservice *my-ktor-service-name* in the section *Probes*. Once here, delete both the default readiness and liveness paths.
-
 ## Expose an endpoint to your microservice
 
 In order to access to your new microservice it is necessary to create an endpoint that targets it.  
@@ -65,45 +61,40 @@ Add inside this folder [directory](https://github.com/mia-platform-marketplace/K
 
 ```kotlin
 package eu.miaplatform.service.controller
-
+import io.ktor.application.Application
 import com.papsign.ktor.openapigen.route.apiRouting
 import com.papsign.ktor.openapigen.route.info
 import com.papsign.ktor.openapigen.route.path.normal.get
 import com.papsign.ktor.openapigen.route.response.respond
 import com.papsign.ktor.openapigen.route.route
 import com.papsign.ktor.openapigen.route.tag
+import com.fasterxml.jackson.annotation.JsonProperty
 import eu.miaplatform.service.model.ServiceTag
-import io.ktor.application.Application
+
+data class HelloWorldResponse (
+    @JsonProperty("message")
+    @get:JsonProperty("message")
+    val message: String
+)
 
 fun helloWorld(application: Application) {
 
     application.apiRouting {
         route("/") {
             tag(ServiceTag) {
-                get<Unit, String>(
+                get<Unit, HelloWorldResponse>(
                     info("The description of the endpoint")
                 ) { params ->
-
-                    respond(HelloWorldResponse("Hello world!"))
+                    var response = HelloWorldResponse("Hello world!")
+                    respond(response)
                 }
             }
         }
     }
 }
-
 ```
 
 In line `respond(HelloWorldResponse("Hello world!"))` you are creating an instance of a class called HelloWorld. 
-You should now define what this class does in another file. In the model package, create a kotlin class and call it 
-HelloWorldResponse. Copy/paste in it the following lines:
-
-```kotlin
-data class HelloWorldResponse (
-    @JsonProperty("message")
-    @get:JsonProperty("message")
-    val message: String
-)
-```
 
 As you can notice we are not using the original ktor `routing` but the `apiRouting` that permits you to construct 
 automatically the `open-api.json`.`
@@ -112,7 +103,20 @@ For more details about how to use the `apiRouting see https://github.com/papsign
 
 You have to import this file in the [file](https://github.com/mia-platform-marketplace/Ktor-Template/tree/master/src/main/kotlin/eu/miaplatform/service/ServiceApplication.kt) inside the `apiRouting` installation. 
 
-In this file you can see the instantiation of the library that creates the saggwers reachable at the endpoint `/documentation`.
+```kotlin
+import eu.miaplatform.service.controller.helloWorld
+
+...
+    ...
+    apiRouting {
+        //here goes your controller
+        helloWorld(this@module)
+    }
+    ...
+
+```
+
+In this file you can see the instantiation of the library that creates the swaggers reachable at the endpoint `/documentation`.
 
 After committing these changes to your repository, you can go back to Mia Platform DevOps Console.  
 Go to the **Deploy** area of the DevOps Console and deploy your project in a similar way to what you have done before modifying your git repository.
