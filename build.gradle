@@ -35,7 +35,7 @@ dependencies {
     compile 'com.google.guava:guava:28.0-jre'
 
     compile "com.squareup.retrofit2:retrofit:2.8.1"
-    compile 'com.squareup.retrofit2:converter-jackson:2.8.1'
+    compile 'com.squareup.retrofit2:converter-jackson:2.9.0'
     compile 'com.squareup.okhttp3:logging-interceptor:4.5.0'
 
     compile "io.ktor:ktor-server-netty:$ktor_version"
