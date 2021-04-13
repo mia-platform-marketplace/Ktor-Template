@@ -32,7 +32,7 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     compile group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '6.6'
 
-    compile 'com.google.guava:guava:28.0-jre'
+    compile 'com.google.guava:guava:30.1.1-jre'
 
     compile "com.squareup.retrofit2:retrofit:2.8.1"
     compile 'com.squareup.retrofit2:converter-jackson:2.9.0'
