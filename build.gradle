@@ -29,7 +29,7 @@ compileTestKotlin {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.5'
     compile group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '6.6'
 
     compile 'com.google.guava:guava:28.0-jre'
