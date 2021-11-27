@@ -6,11 +6,13 @@
             </fieldNames>
         </encoder>
     </appender>
+
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
     <logger name="org.mongodb.driver" level="OFF"/>
     <logger name="org.apache.kafka" level="OFF" />
-    <root level="info">
+
+    <root level="${LOG_LEVEL}">
         <appender-ref ref="json"/>
     </root>
 </configuration>
