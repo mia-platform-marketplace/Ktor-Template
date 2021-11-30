@@ -1,4 +1,4 @@
-package eu.miaplatform.service.model
+package eu.miaplatform.model
 
 data class BadRequestException(val code: Int, val errorMessage: String): Exception(errorMessage)
 data class InternalServerErrorException(val code: Int, val errorMessage: String): Exception(errorMessage)

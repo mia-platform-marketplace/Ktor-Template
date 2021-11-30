@@ -1,71 +1,68 @@
-package eu.miaplatform.service
+package eu.miaplatform
 
 import ch.qos.logback.classic.util.ContextInitializer
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.papsign.ktor.openapigen.OpenAPIGen
 import com.papsign.ktor.openapigen.interop.withAPI
-import com.papsign.ktor.openapigen.route.apiRouting
 import com.papsign.ktor.openapigen.schema.builder.provider.DefaultObjectSchemaProvider
 import com.papsign.ktor.openapigen.schema.namer.DefaultSchemaNamer
 import com.papsign.ktor.openapigen.schema.namer.SchemaNamer
-import eu.miaplatform.service.controller.documentation
-import eu.miaplatform.service.controller.health
-import eu.miaplatform.service.model.*
-import eu.miaplatform.service.model.BadRequestException
-import eu.miaplatform.service.model.NotFoundException
+import eu.miaplatform.applications.DocumentationApplication
+import eu.miaplatform.applications.HealthApplication
+import eu.miaplatform.client.RetrofitClient
+import eu.miaplatform.commons.client.CrudClientInterface
+import eu.miaplatform.core.Serialization
+import eu.miaplatform.core.ktor.install
+import eu.miaplatform.core.openapi.CustomJacksonObjectSchemaProvider
+import eu.miaplatform.model.*
+import eu.miaplatform.model.BadRequestException
+import eu.miaplatform.model.NotFoundException
+import eu.miaplatform.services.StatusService
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.jackson.*
 import io.ktor.request.*
-import io.ktor.routing.*
 import io.ktor.server.netty.*
-import io.ktor.util.*
 import okhttp3.logging.HttpLoggingInterceptor
 import org.slf4j.event.Level
 import java.lang.reflect.InvocationTargetException
-import java.util.*
 import kotlin.reflect.KType
 
 fun main(args: Array<String>) {
     System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, System.getenv("LOG_CONFIG_FILE"))
-    val timeZone = System.getenv("TIME_ZONE")
-    if(timeZone != null) {
-        TimeZone.setDefault(TimeZone.getTimeZone(timeZone))
-    }
     EngineMain.main(args)
 }
 
-@KtorExperimentalAPI
 fun Application.module() {
 
-    val logLevel = when (environment.config.property("ktor.log.level").getString().toUpperCase()) {
-        "DEBUG" -> Level.DEBUG
-        "ERROR" -> Level.ERROR
-        "TRACE" -> Level.TRACE
-        "WARN" -> Level.WARN
-        else -> Level.INFO
-    }
-
-    val httpLogLevel = when (environment.config.property("ktor.log.httpLogLevel").getString().toUpperCase()) {
+    val httpLogLevel = when (environment.config.property("ktor.log.httpLogLevel").getString().uppercase()) {
         "BASIC" -> HttpLoggingInterceptor.Level.BASIC
         "BODY" -> HttpLoggingInterceptor.Level.BODY
         "HEADERS" -> HttpLoggingInterceptor.Level.HEADERS
         else -> HttpLoggingInterceptor.Level.NONE
     }
 
-    module(logLevel)
+    val additionalHeadersToProxy = System.getenv("ADDITIONAL_HEADERS_TO_PROXY") ?: ""
+
+    val crudClient = RetrofitClient.build<CrudClientInterface>(
+        basePath = "http://crud-service/",
+        logLevel = httpLogLevel
+    )
+
+    baseModule()
+    install(DocumentationApplication())
+    install(HealthApplication())
 }
 
-@KtorExperimentalAPI
-fun Application.module(
-    logLevel: Level
-) {
 
+/**
+ * Install common functionalities like open api, logging, metrics, serialization, etc. for this application.
+ */
+fun Application.baseModule() {
     install(CallLogging) {
-        level = logLevel
+        level = Level.INFO
         filter { call -> call.request.path().startsWith("/") }
     }
 
@@ -124,22 +121,12 @@ fun Application.module(
             exception<Exception, ErrorResponse>(HttpStatusCode.InternalServerError) {
                 ErrorResponse(1000, it.localizedMessage ?: "Generic error")
             }
-
         }
     }
 
     install(ContentNegotiation) {
         jackson {
-            this.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            Serialization.apply { defaultKtorLiteral() }
         }
-    }
-
-    apiRouting {
-        //here goes your controller
-    }
-
-    routing {
-        health()
-        documentation(this.application)
     }
 }

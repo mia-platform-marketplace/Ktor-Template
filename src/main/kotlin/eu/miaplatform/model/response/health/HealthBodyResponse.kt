@@ -1,4 +1,4 @@
-package eu.miaplatform.service.model
+package eu.miaplatform.model.response.health
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

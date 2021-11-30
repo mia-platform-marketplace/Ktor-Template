@@ -1,6 +1,15 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="run Service" type="JetRunConfigurationType">
+    <option name="ALTERNATIVE_JRE_PATH" value="11" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <envs>
+      <env name="LOG_CONFIG_FILE" value="./logback.xml" />
+      <env name="LOG_LEVEL" value="info" />
+      <env name="HTTP_LOG_LEVEL" value="body" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="eu.miaplatform.ServiceApplicationKt" />
     <module name="ktor-gradle-template.main" />
+    <shortenClasspath name="NONE" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="false" />
       <option name="IS_SUBST" value="false" />
@@ -11,13 +20,6 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" />
       </ENTRIES>
     </extension>
-    <option name="VM_PARAMETERS" value="" />
-    <option name="PROGRAM_PARAMETERS" value="" />
-    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-    <option name="ALTERNATIVE_JRE_PATH" />
-    <option name="PASS_PARENT_ENVS" value="true" />
-    <option name="MAIN_CLASS_NAME" value="eu.miaplatform.service.ServiceApplicationKt" />
-    <option name="WORKING_DIRECTORY" value="" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

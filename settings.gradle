@@ -1,5 +1,53 @@
 rootProject.name = 'ktor-gradle-template'
 
-include('commons')
-include('service')
+enableFeaturePreview("VERSION_CATALOGS")
 
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven { url 'https://jitpack.io' } // for papsign ktor open api generator
+    }
+
+    versionCatalogs {
+        libs {
+            // junit5
+            version('junit-jupiter', junit_version.toString())
+            alias('mockk').to('io.mockk','mockk').version('1.12.0')
+            alias('assertk').to('com.willowtreeapps.assertk','assertk-jvm').version('0.24')
+            alias('kotest').to('io.kotest','kotest-runner-junit5').version('5.0.0.M3')
+            alias('junit-jupiter-api').to('org.junit.jupiter','junit-jupiter-api').versionRef('junit-jupiter')
+            alias('junit-jupiter-engine').to('org.junit.jupiter','junit-jupiter-engine').versionRef('junit-jupiter')
+            alias('junit-jupiter-params').to('org.junit.jupiter','junit-jupiter-params').versionRef('junit-jupiter')
+            bundle('testImpl-testSuite', ['junit-jupiter-api', 'junit-jupiter-engine', 'junit-jupiter-params', 'mockk', 'assertk', 'kotest'])
+
+            // ktor
+            version('ktor', ktor_version.toString())
+            alias('ktor-netty').to('io.ktor','ktor-server-netty').versionRef('ktor')
+            alias('ktor-server-core').to('io.ktor','ktor-server-core').versionRef('ktor')
+            alias('ktor-client-core').to('io.ktor','ktor-client-core-jvm').versionRef('ktor')
+            alias('ktor-jackson').to('io.ktor','ktor-jackson').versionRef('ktor')
+            alias('ktor-openapi').to('com.github.papsign','Ktor-OpenAPI-Generator').version('0.2-beta.20')
+            bundle('impl-ktor', ['ktor-netty','ktor-server-core','ktor-client-core','ktor-jackson','ktor-openapi'])
+            alias('ktor-server-tests').to('io.ktor','ktor-server-tests').versionRef('ktor')
+            bundle('testImpl-ktor', ['ktor-server-tests'])
+
+            // logback
+            alias('logback-classic').to('ch.qos.logback','logback-classic').version('1.2.7')
+            alias('logback-encoder').to('net.logstash.logback','logstash-logback-encoder').version('6.0')
+            bundle('impl-logback', ['logback-classic','logback-encoder'])
+
+            // jackson
+            version('jackson', jackson_version.toString())
+            alias('jackson-databind').to('com.fasterxml.jackson.core','jackson-databind').versionRef('jackson')
+            alias('jackson-kotlin').to('com.fasterxml.jackson.module','jackson-module-kotlin').versionRef('jackson')
+            alias('jackson-datatype').to('com.fasterxml.jackson.datatype','jackson-datatype-jsr310').versionRef('jackson')
+            bundle('impl-jackson',['jackson-databind','jackson-kotlin','jackson-datatype'])
+
+            // retrofit
+            version('retrofit', retrofit_version.toString())
+            alias('retrofit-retrofit').to('com.squareup.retrofit2','retrofit').versionRef('retrofit')
+            alias('retrofit-converter-jackson').to('com.squareup.retrofit2','converter-jackson').versionRef('retrofit')
+            bundle('impl-retrofit',['retrofit-retrofit','retrofit-converter-jackson'])
+        }
+    }
+}

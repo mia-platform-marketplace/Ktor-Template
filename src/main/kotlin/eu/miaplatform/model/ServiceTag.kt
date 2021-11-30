@@ -1,4 +1,4 @@
-package eu.miaplatform.service.model
+package eu.miaplatform.model
 
 import com.papsign.ktor.openapigen.APITag
 
