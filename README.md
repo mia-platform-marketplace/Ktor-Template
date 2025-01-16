@@ -2,6 +2,8 @@
 
 [![Build Status][github-actions-svg]][github-actions]
 
+> ⚠️ Warning: This repository is no longer maintained.
+
 This walkthrough will explain you how to correctly create a microservice from a Ktor Template using our DevOps Console.
 
 ## Create a microservice
